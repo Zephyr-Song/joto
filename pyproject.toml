@@ -1,0 +1,9 @@
+[project]
+name = "autopub"
+version = "0.1.0"
+description = "Publish Markdown posts to CSDN and Juejin, then sync them to GitHub."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.autopub]
+posts_dir = "posts"

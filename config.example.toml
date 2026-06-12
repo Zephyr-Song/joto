@@ -1,0 +1,24 @@
+[github]
+branch = "main"
+# remote = "https://github.com/your-name/your-repo.git"
+push = true
+init_if_missing = true
+
+[platforms.csdn]
+enabled = true
+cookie = ""
+csrf_token = ""
+referer = "https://mp.csdn.net/mp_blog/creation/editor"
+save_endpoint = "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle"
+publish_endpoint = "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle"
+
+[platforms.juejin]
+enabled = true
+cookie = ""
+csrf_token = ""
+referer = "https://juejin.cn/editor/drafts"
+create_endpoint = "https://api.juejin.cn/content_api/v1/article_draft/create"
+update_endpoint = "https://api.juejin.cn/content_api/v1/article_draft/update"
+publish_endpoint = "https://api.juejin.cn/content_api/v1/article/publish"
+default_category_id = ""
+default_tag_ids = []
