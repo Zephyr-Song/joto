@@ -108,6 +108,19 @@ python -m autopub sync
 
 因为 Cookie 等同登录态，请只保存在本机，不要提交到 GitHub。
 
+如果 CSDN 返回 `X-Ca-Key is not exist`，说明它还需要浏览器请求里的额外鉴权头。处理方式：
+
+1. 打开 CSDN 写作页。
+2. 打开开发者工具的 `Network / Fetch/XHR`。
+3. 点一次保存草稿，找到 `saveArticle` 请求。
+4. 右键该请求，选择 `Copy > Copy as cURL`。
+5. 回到项目目录运行：
+
+```powershell
+.\scripts\import-csdn-curl.ps1
+.\scripts\publish-csdn.ps1
+```
+
 ## 注意事项
 
 - 第一次建议使用 `--dry-run`，工具会把请求内容写到 `.autopub/outbox/`，不会真正联网发布。
