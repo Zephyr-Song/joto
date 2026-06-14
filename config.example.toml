@@ -12,6 +12,10 @@ referer = "https://mp.csdn.net/mp_blog/creation/editor"
 save_endpoint = "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle"
 publish_endpoint = "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle"
 
+[platforms.csdn.headers]
+# CSDN may require browser-generated gateway headers such as X-Ca-Key.
+# Use scripts/import-csdn-curl.ps1 after copying the saveArticle request as cURL.
+
 [platforms.juejin]
 enabled = true
 cookie = ""
