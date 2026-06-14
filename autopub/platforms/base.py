@@ -18,13 +18,17 @@ class BasePublisher:
         raise NotImplementedError
 
     def headers(self) -> dict[str, str]:
-        return {
+        headers = {
             "Cookie": self.config.cookie,
             "Referer": self.config.referer,
             "Origin": origin_from_referer(self.config.referer),
             "X-CSRF-Token": self.config.csrf_token,
             "X-Csrf-Token": self.config.csrf_token,
         }
+        extra_headers = self.config.extra.get("headers", {})
+        if isinstance(extra_headers, dict):
+            headers.update({str(key): str(value) for key, value in extra_headers.items()})
+        return headers
 
     def post(
         self,
