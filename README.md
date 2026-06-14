@@ -102,6 +102,14 @@ python -m autopub publish posts/example.md --platform csdn --action publish --sy
 python -m autopub sync
 ```
 
+一键确认后发布 CSDN：
+
+```powershell
+.\scripts\publish-csdn-confirm.ps1
+```
+
+脚本会检查 CSDN Cookie 和 `X-Ca-Key` 等请求头，显示文章标题，并在真正发布前要求输入 `y` 确认。
+
 ## Cookie 获取方式
 
 登录对应平台后，在浏览器开发者工具的 Network 面板里找到任意已登录请求，复制请求头里的 `Cookie`。如果请求带有 CSRF Token，也复制到配置里。
