@@ -3,7 +3,8 @@ param(
     [ValidateSet("draft", "publish")]
     [string]$Action = "publish",
     [switch]$DryRun,
-    [switch]$Yes
+    [switch]$Yes,
+    [switch]$NoAutoImport
 )
 
 $ErrorActionPreference = "Stop"
@@ -57,17 +58,30 @@ if (-not (Has-CsdnCookie $block)) {
 
 if (-not (Has-CsdnGatewayHeader $block)) {
     Write-Host "CSDN gateway headers such as X-Ca-Key are missing."
-    Write-Host "If your clipboard already contains the CSDN saveArticle cURL, I can import it now."
-    $import = Read-Host "Import CSDN cURL from clipboard now? Type y to import"
-    if ($import -eq "y" -or $import -eq "Y") {
-        & "$PSScriptRoot\import-csdn-curl.ps1"
-        $block = Get-CsdnConfigBlock
+    if (-not $NoAutoImport) {
+        $clipboard = ""
+        try {
+            $clipboard = Get-Clipboard -Raw
+        } catch {
+            $clipboard = ""
+        }
+
+        if ($clipboard -match "curl" -and $clipboard -match "csdn") {
+            Write-Host "Detected a CSDN cURL command in clipboard. Importing request headers..."
+            & "$PSScriptRoot\import-csdn-curl.ps1"
+            $block = Get-CsdnConfigBlock
+        } else {
+            Write-Host "Copy the CSDN saveArticle request as cURL, then run this script again."
+        }
+    } else {
+        Write-Host "Automatic cURL import is disabled."
     }
 }
 
 if (-not (Has-CsdnGatewayHeader $block)) {
-    Write-Host "Still missing X-Ca-Key. Open DevTools > Network, copy saveArticle as cURL, then run:"
-    Write-Host ".\scripts\import-csdn-curl.ps1"
+    Write-Host "Still missing X-Ca-Key."
+    Write-Host "Open DevTools > Network, copy a CSDN saveArticle request as cURL, then run:"
+    Write-Host ".\scripts\publish-csdn-confirm.ps1"
     exit 1
 }
 
