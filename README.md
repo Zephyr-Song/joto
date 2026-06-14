@@ -108,7 +108,7 @@ python -m autopub sync
 .\scripts\publish-csdn-confirm.ps1
 ```
 
-脚本会检查 CSDN Cookie 和 `X-Ca-Key` 等请求头，显示文章标题，并在真正发布前要求输入 `y` 确认。
+脚本会检查 CSDN Cookie 和 `X-Ca-Key` 等请求头。如果剪贴板里已经有 CSDN 的 `Copy as cURL` 内容，它会自动导入请求头；随后显示文章标题，并在真正发布前要求输入 `y` 确认。
 
 ## Cookie 获取方式
 
@@ -125,8 +125,13 @@ python -m autopub sync
 5. 回到项目目录运行：
 
 ```powershell
-.\scripts\import-csdn-curl.ps1
 .\scripts\publish-csdn.ps1
+```
+
+也可以直接运行确认发布入口；如果剪贴板里有刚复制的 cURL，它会自动导入：
+
+```powershell
+.\scripts\publish-csdn-confirm.ps1
 ```
 
 ## 注意事项
