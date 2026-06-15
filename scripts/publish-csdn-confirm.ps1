@@ -43,45 +43,12 @@ function Has-CsdnCookie([string]$Block) {
     return $Block -match 'cookie\s*=\s*"[^"]{20,}"'
 }
 
-function Has-CsdnGatewayHeader([string]$Block) {
-    return $Block -match '(?im)^\s*(X-Ca-Key|x-ca-key)\s*='
-}
-
 $title = Get-ArticleTitle $Article
 $block = Get-CsdnConfigBlock
 
 if (-not (Has-CsdnCookie $block)) {
     Write-Host "CSDN Cookie is missing."
     Write-Host "Copy the CSDN saveArticle request as cURL, then run: .\scripts\import-csdn-curl.ps1"
-    exit 1
-}
-
-if (-not (Has-CsdnGatewayHeader $block)) {
-    Write-Host "CSDN gateway headers such as X-Ca-Key are missing."
-    if (-not $NoAutoImport) {
-        $clipboard = ""
-        try {
-            $clipboard = Get-Clipboard -Raw
-        } catch {
-            $clipboard = ""
-        }
-
-        if ($clipboard -match "curl" -and $clipboard -match "csdn") {
-            Write-Host "Detected a CSDN cURL command in clipboard. Importing request headers..."
-            & "$PSScriptRoot\import-csdn-curl.ps1"
-            $block = Get-CsdnConfigBlock
-        } else {
-            Write-Host "Copy the CSDN saveArticle request as cURL, then run this script again."
-        }
-    } else {
-        Write-Host "Automatic cURL import is disabled."
-    }
-}
-
-if (-not (Has-CsdnGatewayHeader $block)) {
-    Write-Host "Still missing X-Ca-Key."
-    Write-Host "Open DevTools > Network, copy a CSDN saveArticle request as cURL, then run:"
-    Write-Host ".\scripts\publish-csdn-confirm.ps1"
     exit 1
 }
 
@@ -105,13 +72,13 @@ if (-not $Yes) {
     }
 }
 
-$argsList = @(
-    "-Article", $Article,
-    "-Action", $Action
-)
-
-if ($DryRun) {
-    $argsList += "-DryRun"
+$publishArgs = @{
+    Article = $Article
+    Action = $Action
 }
 
-& "$PSScriptRoot\publish-csdn.ps1" @argsList
+if ($DryRun) {
+    $publishArgs["DryRun"] = $true
+}
+
+& "$PSScriptRoot\publish-csdn.ps1" @publishArgs

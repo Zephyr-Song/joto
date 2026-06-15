@@ -35,8 +35,8 @@ class AppConfig:
 
 DEFAULT_ENDPOINTS = {
     "csdn": {
-        "save": "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle",
-        "publish": "https://bizapi.csdn.net/blog-console-api/v3/mdeditor/saveArticle",
+        "save": "https://bizapi.csdn.net/blog-console-api/v1/postedit/saveArticle",
+        "publish": "https://bizapi.csdn.net/blog-console-api/v1/postedit/saveArticle",
     },
     "juejin": {
         "create": "https://api.juejin.cn/content_api/v1/article_draft/create",

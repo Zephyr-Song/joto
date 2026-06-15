@@ -108,7 +108,7 @@ python -m autopub sync
 .\scripts\publish-csdn-confirm.ps1
 ```
 
-脚本会检查 CSDN Cookie 和 `X-Ca-Key` 等请求头。如果剪贴板里已经有 CSDN 的 `Copy as cURL` 内容，它会自动导入请求头；随后显示文章标题，并在真正发布前要求输入 `y` 确认。
+脚本会检查 CSDN Cookie，显示文章标题，并在真正发布前要求输入 `y` 确认。CSDN 的 `X-Ca-Key` / `X-Ca-Nonce` / `X-Ca-Signature` 会由程序自动生成，不需要手动抓包。
 
 ## Cookie 获取方式
 
@@ -116,26 +116,9 @@ python -m autopub sync
 
 因为 Cookie 等同登录态，请只保存在本机，不要提交到 GitHub。
 
-如果 CSDN 返回 `X-Ca-Key is not exist`，说明它还需要浏览器请求里的额外鉴权头。处理方式：
-
-1. 打开 CSDN 写作页。
-2. 打开开发者工具的 `Network / Fetch/XHR`。
-3. 点一次保存草稿，找到 `saveArticle` 请求。
-4. 右键该请求，选择 `Copy > Copy as cURL`。
-5. 回到项目目录运行：
-
-```powershell
-.\scripts\publish-csdn.ps1
-```
-
-也可以直接运行确认发布入口；如果剪贴板里有刚复制的 cURL，它会自动导入：
-
-```powershell
-.\scripts\publish-csdn-confirm.ps1
-```
-
 ## 注意事项
 
 - 第一次建议使用 `--dry-run`，工具会把请求内容写到 `.autopub/outbox/`，不会真正联网发布。
 - 平台接口变更时，优先改 `autopub.toml` 里的 endpoint。
 - GitHub 同步命令会初始化本地 Git 仓库、提交当前变更；只有设置了 `origin` 或 `github.remote` 才会推送。
+- CSDN 接口已内置 `X-Ca-Key` / `X-Ca-Nonce` / `X-Ca-Signature` 动态签名；如果账号当天公开发文数量已达平台限制，程序会明确返回平台提示，需要等额度恢复后再执行发布。

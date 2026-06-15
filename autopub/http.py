@@ -29,8 +29,10 @@ class HttpClient:
         for key, value in headers.items():
             if value:
                 request.add_header(key, value)
-        request.add_header("Content-Type", "application/json;charset=UTF-8")
-        request.add_header("Accept", "application/json, text/plain, */*")
+        if not has_header(headers, "Content-Type"):
+            request.add_header("Content-Type", "application/json;charset=UTF-8")
+        if not has_header(headers, "Accept"):
+            request.add_header("Accept", "application/json, text/plain, */*")
         request.add_header(
             "User-Agent",
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -60,7 +62,11 @@ class HttpClient:
     ) -> dict[str, Any]:
         self.outbox_dir.mkdir(parents=True, exist_ok=True)
         safe_headers = {
-            key: ("<hidden>" if key.lower() in {"cookie", "authorization"} else value)
+            key: (
+                "<hidden>"
+                if key.lower() in {"cookie", "authorization", "x-ca-signature"}
+                else value
+            )
             for key, value in headers.items()
         }
         record = {
@@ -73,3 +79,8 @@ class HttpClient:
         path = self.outbox_dir / filename
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
         return {"dry_run": True, "outbox": str(path)}
+
+
+def has_header(headers: dict[str, str], name: str) -> bool:
+    wanted = name.lower()
+    return any(key.lower() == wanted and bool(value) for key, value in headers.items())
