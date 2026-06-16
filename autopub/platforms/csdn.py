@@ -27,6 +27,14 @@ class CsdnPublisher(BasePublisher):
             if not dry_run and response.get("code") not in (None, 200):
                 message = str(response.get("msg") or response.get("message") or response)
                 return PublishResult(self.platform, action, False, message, response)
+            if not dry_run and action == "publish" and not self.is_confirmed_publish(response):
+                return PublishResult(
+                    self.platform,
+                    action,
+                    False,
+                    "CSDN 接口仅返回 success，未返回文章 ID 或 URL，无法确认已公开发布",
+                    response,
+                )
             message = "文章已发布" if action == "publish" else "草稿已保存"
             return PublishResult(self.platform, action, True, message, response)
         except Exception as exc:
@@ -92,6 +100,50 @@ class CsdnPublisher(BasePublisher):
         )
         headers["X-Ca-Signature"] = signature
         headers["X-Ca-Signature-Headers"] = "x-ca-key,x-ca-nonce"
+
+    def is_confirmed_publish(self, response: dict[str, Any]) -> bool:
+        article_id = self.extract_article_id(response)
+        if article_id:
+            return True
+
+        article_url = self.extract_article_url(response)
+        return bool(article_url)
+
+    def extract_article_id(self, response: dict[str, Any]) -> str:
+        candidates = (
+            response.get("article_id"),
+            response.get("articleId"),
+            response.get("id"),
+        )
+        for value in candidates:
+            if value not in (None, ""):
+                return str(value)
+
+        data = response.get("data")
+        if isinstance(data, dict):
+            for key in ("article_id", "articleId", "id"):
+                value = data.get(key)
+                if value not in (None, ""):
+                    return str(value)
+        return ""
+
+    def extract_article_url(self, response: dict[str, Any]) -> str:
+        candidates = (
+            response.get("url"),
+            response.get("article_url"),
+            response.get("articleUrl"),
+        )
+        for value in candidates:
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+
+        data = response.get("data")
+        if isinstance(data, dict):
+            for key in ("url", "article_url", "articleUrl"):
+                value = data.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        return ""
 
 
 def build_csdn_signature(
