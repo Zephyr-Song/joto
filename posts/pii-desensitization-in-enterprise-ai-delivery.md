@@ -4,7 +4,7 @@ description: PII 脱敏不是企业 AI 项目的附加项，而是从知识库�
 tags: [企业AI, PII脱敏, Dify企业版, 私有化部署, AI安全]
 platforms: [csdn, juejin]
 csdn_categories: [人工智能]
-csdn_article_id: "162088536"
+csdn_article_id: "162089925"
 ---
 
 # 企业 AI 应用交付里，PII 脱敏为什么不能等上线后再补
