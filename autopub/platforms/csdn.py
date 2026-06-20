@@ -27,7 +27,12 @@ class CsdnPublisher(BasePublisher):
             if not dry_run and response.get("code") not in (None, 200):
                 message = str(response.get("msg") or response.get("message") or response)
                 return PublishResult(self.platform, action, False, message, response)
-            if not dry_run and action == "publish" and not self.is_confirmed_publish(response):
+            if (
+                not dry_run
+                and action == "publish"
+                and not self.is_confirmed_publish(response)
+                and not self.is_acknowledged_success(response)
+            ):
                 return PublishResult(
                     self.platform,
                     action,
@@ -108,6 +113,17 @@ class CsdnPublisher(BasePublisher):
 
         article_url = self.extract_article_url(response)
         return bool(article_url)
+
+    def is_acknowledged_success(self, response: dict[str, Any]) -> bool:
+        if response.get("code") != 200:
+            return False
+
+        message = str(response.get("msg") or response.get("message") or "").strip().lower()
+        if message == "success":
+            return True
+
+        data = response.get("data")
+        return isinstance(data, str) and data.strip() in {"成功", "success", "Success"}
 
     def extract_article_id(self, response: dict[str, Any]) -> str:
         candidates = (

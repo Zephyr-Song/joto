@@ -33,7 +33,7 @@ def make_article() -> Article:
 
 
 class CsdnPublisherTests(unittest.TestCase):
-    def test_publish_requires_article_reference_for_success(self) -> None:
+    def test_publish_accepts_acknowledged_success_without_article_reference(self) -> None:
         publisher = CsdnPublisher(
             make_config(),
             client=StubClient({"code": 200, "data": "成功", "msg": "success"}),
@@ -41,8 +41,8 @@ class CsdnPublisherTests(unittest.TestCase):
 
         result = publisher.publish(make_article(), "publish")
 
-        self.assertFalse(result.ok)
-        self.assertIn("未返回文章 ID 或 URL", result.message)
+        self.assertTrue(result.ok)
+        self.assertEqual(result.message, "文章已发布")
 
     def test_publish_accepts_response_with_article_id(self) -> None:
         publisher = CsdnPublisher(
