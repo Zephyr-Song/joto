@@ -4,6 +4,7 @@ description: 很多企业把 Workflow 和 Agent 交付难点归结为编排复�
 tags: [JOTO, Dify, Workflow, Agent, 知识库]
 platforms: [csdn, juejin]
 csdn_categories: [人工智能]
+csdn_article_id: "162446932"
 ---
 
 # 企业做 Workflow 和 Agent 落地前，为什么先要把知识库分层
