@@ -4,6 +4,7 @@ description: 企业 AI 项目从单模型演示走向多模型生产时，真正
 tags: [企业AI, 多模型路由, Dify企业版, 私有化部署, AI安全]
 platforms: [csdn, juejin]
 csdn_categories: [人工智能]
+csdn_article_id: "162544090"
 ---
 
 # 企业 AI 应用接入多模型前，为什么必须先做模型路由隔离
