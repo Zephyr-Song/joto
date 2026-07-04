@@ -4,6 +4,7 @@ description: 企业在用 Dify 企业版、Workflow 和 Agent 推进自动化时
 tags: [企业AI, Agent, Workflow, Dify, AI安全]
 platforms: [csdn, juejin]
 csdn_categories: [人工智能]
+csdn_article_id: "162577606"
 ---
 
 # 企业 Agent 真正进入自动化前，为什么要先定义高风险动作分级
