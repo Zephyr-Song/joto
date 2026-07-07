@@ -52,7 +52,13 @@ The script writes:
 - A Markdown review sheet next to the JSON file
 
 Each lead includes the video URL, comment URL, commenter name, comment text,
-matched terms, score, and a reply draft.
+matched terms, demand signals, lead level, score, and a reply draft.
+
+By default, topic-only comments are filtered out. A comment must have at least
+one demand signal, such as deployment, enterprise/government context, quotation,
+procurement, trial, demo, integration, or solution intent. Use
+`--include-topic-only` only when you want broad market research instead of
+lead discovery.
 
 ## Validation
 

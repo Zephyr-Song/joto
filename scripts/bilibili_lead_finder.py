@@ -61,11 +61,18 @@ INTENT_TERMS = (
     "方案",
     "报价",
     "多少钱",
+    "采购",
+    "预算",
+    "试用",
+    "演示",
     "供应商",
     "客户",
+    "政府",
     "项目",
     "落地",
 )
+HIGH_INTENT_TERMS = ("报价", "多少钱", "采购", "预算", "试用", "演示", "供应商", "客户")
+DEMAND_SIGNAL_TERMS = set(INTENT_TERMS)
 SKIP_USER_PATTERNS = ("AI视频总结", "课代表")
 SKIP_MESSAGE_PATTERNS = ("AI课代表总结", "课代表总结")
 
@@ -87,6 +94,11 @@ def main() -> int:
     parser.add_argument("--max-videos", type=int, default=5)
     parser.add_argument("--comments-per-video", type=int, default=30)
     parser.add_argument("--min-score", type=int, default=2)
+    parser.add_argument(
+        "--include-topic-only",
+        action="store_true",
+        help="also include comments that only match a business topic without demand signals",
+    )
     parser.add_argument("--reply", default=DEFAULT_REPLY)
     parser.add_argument("--out", default=".commentops/leads/bilibili-leads.json")
     args = parser.parse_args()
@@ -106,10 +118,12 @@ def main() -> int:
             continue
 
         for comment in comments:
-            score, matched = score_comment(comment["message"])
+            classification = classify_comment(comment["message"])
             if should_skip_comment(comment):
                 continue
-            if score < args.min_score:
+            if classification["score"] < args.min_score:
+                continue
+            if not args.include_topic_only and not classification["demand_signals"]:
                 continue
             leads.append(
                 {
@@ -119,8 +133,10 @@ def main() -> int:
                     "video_url": resolved.url,
                     "comment_url": f"{resolved.url}#reply{comment['rpid']}",
                     "comment": comment,
-                    "score": score,
-                    "matched_terms": matched,
+                    "score": classification["score"],
+                    "matched_terms": classification["matched_terms"],
+                    "demand_signals": classification["demand_signals"],
+                    "lead_level": classification["lead_level"],
                     "reply_draft": args.reply,
                     "status": "needs_human_review",
                 }
@@ -231,6 +247,11 @@ def fetch_comments(bvid: str, limit: int = 30) -> list[dict[str, Any]]:
 
 
 def score_comment(message: str) -> tuple[int, list[str]]:
+    classification = classify_comment(message)
+    return int(classification["score"]), list(classification["matched_terms"])
+
+
+def classify_comment(message: str) -> dict[str, Any]:
     text = message.lower()
     compact_text = text.replace(" ", "")
     matched: list[str] = []
@@ -245,7 +266,23 @@ def score_comment(message: str) -> tuple[int, list[str]]:
         if term.lower() in text:
             matched.append(term)
             score += 1
-    return score, matched
+    demand_signals = [term for term in matched if term in DEMAND_SIGNAL_TERMS]
+    return {
+        "score": score,
+        "matched_terms": matched,
+        "demand_signals": demand_signals,
+        "lead_level": lead_level(demand_signals),
+    }
+
+
+def lead_level(demand_signals: list[str]) -> str:
+    if any(term in demand_signals for term in HIGH_INTENT_TERMS):
+        return "high"
+    if any(term in demand_signals for term in ("公司", "企业", "政府", "部署", "对接", "方案", "项目", "落地")):
+        return "medium"
+    if demand_signals:
+        return "low"
+    return "topic_only"
 
 
 def is_strong_intent(text: str, term: str) -> bool:
@@ -348,6 +385,8 @@ def render_review_sheet(output: dict[str, Any]) -> str:
                 f"- Video: [{lead['video_title']}]({lead['video_url']})",
                 f"- Comment: {lead['comment_url']}",
                 f"- Matched: {', '.join(lead['matched_terms'])}",
+                f"- Demand signals: {', '.join(lead['demand_signals'])}",
+                f"- Lead level: {lead['lead_level']}",
                 f"- Status: {lead['status']}",
                 "",
                 "Comment:",
