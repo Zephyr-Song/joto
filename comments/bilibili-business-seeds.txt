@@ -1,0 +1,8 @@
+# Public Bilibili videos related to JOTO's AI NetOps, AI guardrail, and private deployment work.
+# One BV id or URL per line.
+https://www.bilibili.com/video/BV1JATRzsEvN/
+https://www.bilibili.com/video/BV1v5SFBmE4v/
+https://www.bilibili.com/video/BV1ioPqePEra/
+https://www.bilibili.com/video/BV1FfNKexE2g/
+https://www.bilibili.com/video/BV1AA5p66EPW/
+https://www.bilibili.com/video/BV1b4jvzzENn/
