@@ -1,4 +1,5 @@
 .autopub/
+.commentops/
 .env
 autopub.toml
 __pycache__/
